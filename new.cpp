@@ -541,6 +541,239 @@ void random(pig *u){//随机一个猪
     u->ill = false;
 }
 
+void sourcedisease(Lnode *h,int n,int m){//设置一个病源猪
+    Lnode *p = h;
+    for (int j = 0; j < n;j++){
+        p = p->next;
+    }
+    p->Data.illpignum++;
+    lnode *r = p->Data.a;
+    for (int d = 0; d < m;d++){
+        r = r->next;
+    }
+    r->data.ill = true;
+}
+
+void outputill(Lnode *h){//显示猪圈猪的位置供用户选择
+    Lnode *p;
+    p = h;
+    while(p->next!=NULL)
+    {
+        if(p->Data.pignum!=0){
+            cout<<p->Data.no<<"号猪圈"<<" ";
+            lnode *r = p->Data.a;
+            while(r->next!=NULL){
+                if(r->data.weight!=0)
+                cout << r->data.num << " ";
+                r=r->next;
+            }
+            cout << endl;
+        }
+        p=p->next;
+    }
+}
+
+static int contagionda;
+void infectedpig(Lnode *h,int n){//感染本猪圈和相邻猪圈
+    int contagion=2;
+    double loss;
+    Lnode *p;
+    p = h;
+    for (int j = 0; j < n; j++)
+    {
+        p = p->next;
+    }
+    lnode *r = p->Data.a;
+    for (; r->next != NULL; r = r->next)
+        {
+            if (r->data.weight != 0 && r->data.ill == false)
+            {
+                int t = rand() % 100;
+                if (t < 50)
+                {
+                    p->Data.illpignum++;
+                    r->data.ill = true;
+                    contagion = 1;
+                    if (r->data.type == &a[0])
+                    {
+                        loss = r->data.weight * 30;
+                    }
+                    if (r->data.type == &b[0])
+                    {
+                        loss = r->data.weight * 14;
+                    }
+                    if (r->data.type == &c[0])
+                    {
+                        loss = r->data.weight * 12;
+                    }
+                    cout << r->data.pigstynum << "号猪圈" << r->data.num << r->data.type << "被感染 "
+                         << "损失" << loss << "元" << endl;
+                }
+            }
+        }
+    if(n!=99){
+        r = p->next->Data.a;
+        for (; r->next != NULL; r = r->next)
+        {
+            if(r->data.weight!=0&&r->data.ill==false){
+                int t = rand() % 100;
+                if (t < 15)
+                {
+                    p->Data.illpignum++;
+                    r->data.ill = true;
+                    contagion = 1;
+                    if (r->data.type == &a[0])
+                    {
+                        loss = r->data.weight * 30;
+                    }
+                    if (r->data.type == &b[0])
+                    {
+                        loss = r->data.weight * 14;
+                    }
+                    if (r->data.type == &c[0])
+                    {
+                        loss = r->data.weight * 12;
+                    }
+                    cout << r->data.pigstynum <<"号猪圈"<< r->data.num << r->data.type << "被感染 "<< "损失" << loss << "元" << endl;
+                }
+            }
+        }
+    }
+    p = h;
+    if(n!=0){
+        for (int j = 0; j < n - 1; j++)
+        {
+            p = p->next;
+        }
+        r = p->Data.a;
+        for (; r->next != NULL; r = r->next)
+        {
+            if(r->data.weight!=0&&r->data.ill==false){
+                int t = rand() % 100;
+                if (t < 15)
+                {
+                    p->Data.illpignum++;
+                    r->data.ill = true;
+                    contagion = 1;
+                    if (r->data.type == &a[0])
+                    {
+                        loss = r->data.weight * 30;
+                    }
+                    if (r->data.type == &b[0])
+                    {
+                        loss = r->data.weight * 14;
+                    }
+                    if (r->data.type == &c[0])
+                    {
+                        loss = r->data.weight * 12;
+                    }
+                    cout << r->data.pigstynum <<"号猪圈"<< r->data.num << r->data.type << "被感染 "<< "损失" << loss << "元" << endl;
+                }
+            }
+        }
+    }
+    if(contagion==1) contagionda = 1;
+    else contagionda = 0;
+}
+
+static int head=0;
+static int back=99;
+void illpigsty(Lnode *h){//计算感染的猪圈数
+    Lnode *p;
+    p = h;
+    while(p->next!=NULL){
+        int k = 0;
+        lnode *r;
+        r = p->Data.a;
+        while(r->next!=NULL){
+            if(r->data.ill==true&&r->data.weight!=0){
+                head = p->Data.no;
+                k = 1;
+                break;
+            }
+            r = r->next;
+        }
+        if(k==1) break;
+        p = p->next;
+    }
+    while(p->next!=NULL){
+        lnode *r;
+        r = p->Data.a;
+        int j = 0;
+        while(r->next!=NULL){
+            if(r->data.ill==false&&r->data.weight!=0){
+                j++;
+            }
+            r = r->next;
+        }
+        if(j==p->Data.pignum) {
+            back = p->Data.no - 1;
+            break;
+        }
+        p = p->next;
+    }
+}
+
+bool allill(Lnode *h){//判断是否全部感染
+    Lnode *p;
+    p = h;
+    while(p->next!=NULL){
+        lnode *r;
+        r = p->Data.a;
+        while(r->next!=NULL){
+            if(r->data.weight!=0&&r->data.ill==false){
+                return false;
+            }
+            r = r->next;
+        }
+        p = p->next;
+    }
+    return true;
+}
+
+void allhealthy(Lnode *h){//把所有猪都设为没病
+    Lnode *p;
+    p = h;
+    while(p->next!=NULL){
+        lnode *r;
+        r = p->Data.a;
+        p->Data.illpignum = 0;
+        while(r->next!=NULL){
+            if(r->data.weight!=0){
+                r->data.ill = false;
+            }
+            r = r->next;
+        }
+        p = p->next;
+    }
+}
+
+
+
+void DeadPig(Lnode *h){//患病猪超过75kg就死了，把死猪清空
+    Lnode *p;
+    p = h;
+    while(p->next!=NULL){
+        lnode *r;
+        r = p->Data.a;
+        if(p->Data.illpignum==10){
+            p->Data.illpignum = 0;
+            while(r->next!=NULL){
+                if(r->data.ill==true&&r->data.weight>=75){
+                    r->data.ill = false;
+                    r->data.pri = 0;
+                    r->data.time = 0;
+                    r->data.type = &d[0];
+                    r->data.weight = 0;
+                    r->data.num = 0;
+                    p->Data.pignum--;
+                }
+                r = r->next;
+            }
+        }
+        p = p->next;
+    }
+}
 
 int main()
 {
@@ -621,7 +854,7 @@ int main()
         if (days % 90 == 0)
         {
             pricesum(p);
-           
+            DeadPig(p);
             int littlepig = rand() % 100;
             for (int jj = 0; jj < littlepig; jj++)
             {
@@ -727,6 +960,51 @@ int main()
                 }
                 else if(button==5) break;
                 else if(button==6){
+                    cout << "这是目前所有的猪" << endl;
+                    outputill(p);
+                    //allhealthy(p);
+                    cout << "请选择病源猪" << endl;
+                    cout << "输入格式：猪圈序号(0-99)  " << endl;
+                    cout << "          猪的序号(0-9)" << endl;
+                    int n, m;
+                    cin >> n >> m;
+                    sourcedisease(p, n, m);
+                    system("cls");
+                    cout << "下面为您实时播报感染情况" << endl;
+                    int jj = 1;
+                    for (;allill(p)!=true;jj++){
+                        days++;
+                        ergoPW(p);
+                        int contagionDa = 0;
+                        illpigsty(p);
+                        for (int rr = head; rr <= back;rr++){
+                            infectedpig(p, rr);
+                            if(contagionda==1) contagionDa = 1;
+                        }
+                        if(contagionDa==1) {
+                            cout << "第" << days << "天" << endl;
+                            cout << "=====================================" << endl;
+                        }
+                        Sleep(100);
+                        if(days%90==0){
+                            pricesum(p);
+                        }
+                        double uu=0;
+                        if (_kbhit()){//如果有按键按下，则_kbhit()函数返回真，头文件conio.h
+                            getch();//键盘输入，不会显示
+                            int yy = 1;
+                            
+                                }
+                            
+                            getch();
+                            system("cls");
+                        }
+                       
+                    
+                    if(price[0]==0) cout << "卖出健康猪0元" << endl;
+                    else cout << "卖出健康猪" << price << "元" << endl;
+                    cout << "至此所有猪都感染猪瘟,历时"<<jj<<"天" << endl;
+                    //return 0;
                 }
                 else if(button==7) {
                     File(p,days);
