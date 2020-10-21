@@ -748,7 +748,68 @@ void allhealthy(Lnode *h){//把所有猪都设为没病
     }
 }
 
-
+void dangerControl(Lnode *h){//风险控制
+    Lnode *p;
+    p = h;
+    int J = 0,f=0;
+    lnode *r;
+    while(p->next!=NULL){
+        r = p->Data.a;
+        while(r->next!=NULL){
+            if(r->data.ill==true){
+                f = 1;
+                break;
+            }
+            r = r->next;
+        }
+        if(f==1){
+            Lnode *pp;
+            pp = h;
+            for (int jj = 0; jj < J-1;jj++){
+                pp = pp->next;
+            }
+            int x = 0;
+			double Pric = 0;
+            while(pp->next!=NULL&&x<3){
+                pp->Data.illpignum = 10;
+                r = pp->Data.a;
+                while(r->next!=NULL){
+                    if(r->data.weight!=0&&r->data.ill==false){
+                        if (r->data.type == &a[0])
+                        {
+                            Pric = Pric + r->data.weight * 30;
+                        }
+                        else if (r->data.type == &b[0])
+                        {
+                            Pric = Pric + r->data.weight * 14;
+                        }
+                        else if (r->data.type == &c[0])
+                        {
+                            Pric = Pric + r->data.weight * 12;
+                        }
+                        r->data.time = 0;
+                        r->data.type = &d[0];
+                        r->data.weight = 0;
+                        r->data.ill = false;
+                        pp->Data.pignum--;
+                    }
+                    r = r->next;
+                }
+                x++;
+                pp = pp->next;  
+            }
+            cout << "=====================" << endl;
+            if(J==0) cout << "隔离了"<< J <<" "<< J + 1 << "号猪圈" << endl;
+            else if(J==99) cout << "隔离了" << J - 1 <<" "<< J << "号猪圈" << endl;
+            else cout << "隔离了" << J - 1 <<" "<< J <<" "<< J + 1 << "号猪圈" << endl;
+            cout << "卖出" << Pric << "元" << endl;
+            cout << "=====================" << endl;
+            f = 0;
+        }
+        J++;
+        p = p->next;
+    }
+}
 
 void DeadPig(Lnode *h){//患病猪超过75kg就死了，把死猪清空
     Lnode *p;
@@ -993,14 +1054,48 @@ int main()
                         if (_kbhit()){//如果有按键按下，则_kbhit()函数返回真，头文件conio.h
                             getch();//键盘输入，不会显示
                             int yy = 1;
-                            
+                            while(yy){
+                                system("cls");
+                                cout << "========================="<<endl;
+                                cout <<  "    是否进行风险控制" << endl;
+                                cout << "           1.是" << endl;
+                                cout << "           2.否" << endl;
+                                cout << "           3.帮助" << endl;
+                                cout << "========================="<<endl;
+                                cin >> button;
+                                if(button==1){
+                                    system("cls");
+                                    dangerControl(p);
+                                    yy = 0;
+                                    cout << "========================================" << endl;
+                                    cout << "      已成功进行风险控制，目前猪圈正常" << endl;
+                                    cout << "                。。。。。" << endl;
+                                    cout << "========================================" << endl;
+                                    cout << "                按任意键继续" << endl;
+                                    uu = 1.876;
                                 }
-                            
+                                else if(button==2){
+                                    system("cls");
+                                    cout << "按任意键可继续进行" << endl;
+                                    yy = 0;
+                                }
+                                else if(button==3){
+                                    system("cls");
+                                    cout << "===================================" << endl;
+                                    cout << "我们将会以卖掉病猪圈周围猪圈的健康猪" << endl;
+                                    cout << "并不再将新猪放进这些猪圈来进行防控。" << endl;
+                                    cout << "              1.返回" << endl;
+                                    cout << "===================================" << endl;
+                                    cin >> button;
+                                    system("cls");
+                                    if(button==1) yy=1;
+                                }
+                            }
                             getch();
                             system("cls");
                         }
-                       
-                    
+                        if(uu==1.876) cout << "..........耐心等待，因为无感染所以不显示，别乱点.........." << endl;
+                    }
                     if(price[0]==0) cout << "卖出健康猪0元" << endl;
                     else cout << "卖出健康猪" << price << "元" << endl;
                     cout << "至此所有猪都感染猪瘟,历时"<<jj<<"天" << endl;
